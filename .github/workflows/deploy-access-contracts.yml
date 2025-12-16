@@ -107,7 +107,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       
-      - name: Validate ${{ matrix.contract }}
+      - name: Pre-flight resource validation for ${{ matrix.contract }}
         run: |
           CONTRACT_PATH="${{ env.CONTRACTS_PATH }}/${{ matrix.contract }}/usecase.bicepparam"
           
@@ -116,14 +116,74 @@ jobs:
             exit 1
           fi
           
-          echo "Validating ${{ matrix.contract }}..."
+          echo "🔍 Validating referenced Azure resources exist..."
+          
+          # Extract APIM configuration from bicepparam file
+          APIM_SUB=$(grep -A3 "param apim" "$CONTRACT_PATH" | grep "subscriptionId:" | sed "s/.*'\([^']*\)'.*/\1/")
+          APIM_RG=$(grep -A3 "param apim" "$CONTRACT_PATH" | grep "resourceGroupName:" | sed "s/.*'\([^']*\)'.*/\1/")
+          APIM_NAME=$(grep -A4 "param apim" "$CONTRACT_PATH" | grep "name:" | head -1 | sed "s/.*'\([^']*\)'.*/\1/")
+          
+          echo "  APIM Subscription: $APIM_SUB"
+          echo "  APIM Resource Group: $APIM_RG"
+          echo "  APIM Name: $APIM_NAME"
+          
+          # Validate APIM exists
+          if [ -n "$APIM_NAME" ] && [ "$APIM_NAME" != "" ]; then
+            echo ""
+            echo "🔎 Checking if APIM '$APIM_NAME' exists..."
+            if az apim show --name "$APIM_NAME" --resource-group "$APIM_RG" --subscription "$APIM_SUB" --query "name" -o tsv 2>/dev/null; then
+              echo "✅ APIM '$APIM_NAME' found"
+            else
+              echo "❌ ERROR: APIM '$APIM_NAME' not found in resource group '$APIM_RG'"
+              echo ""
+              echo "Available APIM services in '$APIM_RG':"
+              az apim list --resource-group "$APIM_RG" --subscription "$APIM_SUB" --query "[].name" -o tsv 2>/dev/null || echo "  (none found or resource group doesn't exist)"
+              echo ""
+              echo "Please update the 'apim.name' value in your contract file."
+              exit 1
+            fi
+          fi
+          
+          # Extract Key Vault configuration
+          USE_KV=$(grep "useTargetAzureKeyVault" "$CONTRACT_PATH" | grep -o "true\|false" || echo "false")
+          
+          if [ "$USE_KV" == "true" ]; then
+            KV_SUB=$(grep -A3 "param keyVault" "$CONTRACT_PATH" | grep "subscriptionId:" | sed "s/.*'\([^']*\)'.*/\1/")
+            KV_RG=$(grep -A3 "param keyVault" "$CONTRACT_PATH" | grep "resourceGroupName:" | sed "s/.*'\([^']*\)'.*/\1/")
+            KV_NAME=$(grep -A4 "param keyVault" "$CONTRACT_PATH" | grep "name:" | head -1 | sed "s/.*'\([^']*\)'.*/\1/")
+            
+            if [ -n "$KV_NAME" ] && [ "$KV_NAME" != "" ]; then
+              echo ""
+              echo "🔎 Checking if Key Vault '$KV_NAME' exists..."
+              if az keyvault show --name "$KV_NAME" --resource-group "$KV_RG" --subscription "$KV_SUB" --query "name" -o tsv 2>/dev/null; then
+                echo "✅ Key Vault '$KV_NAME' found"
+              else
+                echo "❌ ERROR: Key Vault '$KV_NAME' not found in resource group '$KV_RG'"
+                echo ""
+                echo "Please verify the Key Vault exists or set 'useTargetAzureKeyVault = false'"
+                exit 1
+              fi
+            fi
+          else
+            echo ""
+            echo "ℹ️  Key Vault storage disabled (useTargetAzureKeyVault = false)"
+          fi
+          
+          echo ""
+          echo "✅ Pre-flight resource validation passed"
+      
+      - name: Validate Bicep template for ${{ matrix.contract }}
+        run: |
+          CONTRACT_PATH="${{ env.CONTRACTS_PATH }}/${{ matrix.contract }}/usecase.bicepparam"
+          
+          echo "📋 Validating Bicep template..."
           az deployment sub validate \
             --location ${{ env.AZURE_LOCATION }} \
             --template-file bicep/infra/citadel-access-contracts/main.bicep \
             --parameters "$CONTRACT_PATH" \
             --output table
           
-          echo "✅ ${{ matrix.contract }} is valid"
+          echo "✅ ${{ matrix.contract }} Bicep validation passed"
       
       - name: Comment on PR
         if: github.event_name == 'pull_request'
@@ -134,7 +194,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '✅ Contract `${{ matrix.contract }}` validated successfully!'
+              body: '✅ Contract `${{ matrix.contract }}` validated successfully!\n\n- Pre-flight resource check: ✅\n- Bicep validation: ✅'
             })
 
   # ---------------------------------------------------------------------------
