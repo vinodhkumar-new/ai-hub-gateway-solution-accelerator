@@ -18,7 +18,7 @@ using '../../main.bicep'
 param apim = {
   subscriptionId: '3a0eed45-6d6a-4200-a0f1-85e73312a1a8'
   resourceGroupName: 'rg-citadel-dev'
-  name: 'apim-citadel-dev'
+  name: 'apim-xot5i4klj5zea'
 }
 
 // ============================================================================

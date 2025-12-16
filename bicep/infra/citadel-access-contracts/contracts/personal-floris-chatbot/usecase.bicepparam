@@ -13,22 +13,21 @@ using '../../main.bicep'
 param apim = {
   subscriptionId: '3a0eed45-6d6a-4200-a0f1-85e73312a1a8'
   resourceGroupName: 'rg-citadel-dev'
-  name: 'apim-citadel-dev'
+  name: 'apim-xot5i4klj5zea'
 }
 
 // ============================================================================
 // KEY VAULT CONFIGURATION
 // ============================================================================
-// Since no spoke Key Vault is available, credentials will be stored in the
-// hub's Key Vault. Set useTargetAzureKeyVault = false.
+// No Key Vault storage - credentials will be retrieved directly from APIM.
 
 param keyVault = {
-  subscriptionId: '3a0eed45-6d6a-4200-a0f1-85e73312a1a8'
-  resourceGroupName: 'rg-citadel-dev'
-  name: 'kv-citadel-dev'
+  subscriptionId: ''
+  resourceGroupName: ''
+  name: ''
 }
 
-// Store credentials in hub Key Vault (no spoke KV available)
+// Skip Key Vault storage
 param useTargetAzureKeyVault = false
 
 // ============================================================================
