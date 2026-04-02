@@ -102,7 +102,7 @@
 
                             clusters.Add(new JObject()
                             {
-                                { "deploymentName", "gpt-4-1" },
+                                { "deploymentName", "gpt-4.1" },
                                 { "routes", new JArray(routes[0]) }
                             });
                             

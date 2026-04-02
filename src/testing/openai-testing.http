@@ -2,7 +2,7 @@
 @aiHRSubscriptionKey = ""
 @aiRetailSubscriptionKey = ""
 
-### gpt-4-1-mini/AI-HR
+### gpt-4.1-mini/AI-HR
 POST {{aiHubGatewayOpenAIBaseUrl}}/chat/chat/completions?api-version=2024-06-01
 Content-Type: application/json
 api-key: {{aiHRSubscriptionKey}}
@@ -15,8 +15,8 @@ api-key: {{aiHRSubscriptionKey}}
   "stream": true
 }
 
-### gpt-4-1/AI-HR
-POST {{aiHubGatewayOpenAIBaseUrl}}/gpt-4-1/chat/completions?api-version=2024-06-01
+### gpt-4.1/AI-HR
+POST {{aiHubGatewayOpenAIBaseUrl}}/gpt-4.1/chat/completions?api-version=2024-06-01
 Content-Type: application/json
 api-key: {{aiHRSubscriptionKey}}
 
@@ -28,7 +28,7 @@ api-key: {{aiHRSubscriptionKey}}
   "stream": false
 }
 
-### gpt-4-1-mini/AI-Retail
+### gpt-4.1-mini/AI-Retail
 POST {{aiHubGatewayOpenAIBaseUrl}}/chat/chat/completions?api-version=2024-06-01
 Content-Type: application/json
 api-key: {{aiRetailSubscriptionKey}}

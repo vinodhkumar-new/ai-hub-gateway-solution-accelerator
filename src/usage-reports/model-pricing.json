@@ -14,7 +14,7 @@
     },
     {
         "id": "2",
-        "model": "gpt-4-1-mini",
+        "model": "gpt-4.1-mini",
         "deploymentName": "chat",
         "isActive": true,
         "CostPerInputUnit": 0.15,
@@ -27,8 +27,8 @@
     },
     {
         "id": "3",
-        "model": "gpt-4-1",
-        "deploymentName": "gpt-4-1",
+        "model": "gpt-4.1",
+        "deploymentName": "gpt-4.1",
         "isActive": true,
         "CostPerInputUnit": 0.03,
         "CostPerOutputUnit": 0.06,
@@ -40,8 +40,8 @@
     },
     {
         "id": "4",
-        "model": "gpt-4-1",
-        "deploymentName": "gpt-4-1",
+        "model": "gpt-4.1",
+        "deploymentName": "gpt-4.1",
         "isActive": true,
         "CostPerInputUnit": 0.005,
         "CostPerOutputUnit": 0.015,
