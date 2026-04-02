@@ -264,8 +264,8 @@ param openAiInstances object = {
         name: 'chat'
         model: {
           format: 'OpenAI'
-          name: 'gpt-4o-mini'
-          version: '2024-07-18'
+          name: 'gpt-4-1-mini'
+          version: '2025-04-14'
         }
         sku: {
           name: 'Standard'
@@ -286,11 +286,11 @@ param openAiInstances object = {
         }
       }
       {
-        name: 'gpt-4o'
+        name: 'gpt-4-1'
         model: {
           format: 'OpenAI'
-          name: 'gpt-4o'
-          version: '2024-05-13'
+          name: 'gpt-4-1'
+          version: '2025-04-14'
         }
         sku: {
           name: 'GlobalStandard'
@@ -307,8 +307,8 @@ param openAiInstances object = {
         name: 'chat'
         model: {
           format: 'OpenAI'
-          name: 'gpt-4o-mini'
-          version: '2024-07-18'
+          name: 'gpt-4-1-mini'
+          version: '2025-04-14'
         }
         sku: {
           name: 'Standard'
@@ -326,8 +326,8 @@ param openAiInstances object = {
         name: 'chat'
         model: {
           format: 'OpenAI'
-          name: 'gpt-4o-mini'
-          version: '2024-07-18'
+          name: 'gpt-4-1-mini'
+          version: '2025-04-14'
         }
         sku: {
           name: 'Standard'

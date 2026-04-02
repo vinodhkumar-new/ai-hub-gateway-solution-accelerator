@@ -4,7 +4,7 @@
         <!-- Capacity management - Subscription Level: allow only assigned tpm for each HR use case subscription -->
         <set-variable name="target-deployment" value="@((string)context.Request.MatchedParameters["deployment-id"])" />
         <choose>
-            <when condition="@((string)context.Variables["target-deployment"] == "gpt-4o")">
+            <when condition="@((string)context.Variables["target-deployment"] == "gpt-4-1")">
                 <azure-openai-token-limit 
                     counter-key="@(context.Subscription.Id + "-" + context.Variables["target-deployment"])" 
                     tokens-per-minute="10000" 
