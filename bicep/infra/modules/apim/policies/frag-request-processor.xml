@@ -61,7 +61,7 @@
                     var match = context.Variables.GetValueOrDefault<JObject>("config-api-types")?.Children<JProperty>()
                         .FirstOrDefault(a => {
                             var basePath = a.Value["base-path"]?.ToString();
-                            return !String.IsNullOrEmpty(basePath) && path.Contains(basePath);
+                            return !String.IsNullOrEmpty(basePath) && path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase);
                         });
                     return match?.Name ?? String.Empty;
                 } catch { return String.Empty; }
