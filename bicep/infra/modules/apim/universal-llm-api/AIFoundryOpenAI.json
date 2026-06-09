@@ -30,8 +30,7 @@
       "get": {
         "operationId": "deployments",
         "description": "Get deployments for Azure OpenAI resource for AI Foundry Integration",
-        "parameters": [
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "AI Foundry integration operations for retrieving available deployments",
@@ -63,8 +62,7 @@
               }
             },
             "content": {
-              "application/json": {
-              }
+              "application/json": {}
             }
           }
         },
@@ -72,33 +70,34 @@
       }
     },
     "/deployments/{deployment-id}": {
-        "get": {
-            "summary": "Get deployment by name",
-            "operationId": "deployment-by-name",
-            "description": "Get deployment details by deployment name for LLM resource for Microsoft Foundry Integration",
-            "parameters": [{
-                "name": "deployment-id",
-                "in": "path",
-                "required": true,
-                "schema": {
-                    "enum": [""],
-                    "type": ""
-                }
-            }],
-            "responses": {
-                "200": {
-                    "description": ""
-                }
+      "get": {
+        "summary": "Get deployment by name",
+        "operationId": "deployment-by-name",
+        "description": "Get deployment details by deployment name for LLM resource for Microsoft Foundry Integration",
+        "parameters": [
+          {
+            "name": "deployment-id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                ""
+              ],
+              "type": ""
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
         }
+      }
     },
     "/deployments/{deployment-id}/completions": {
       "post": {
         "description": "Creates a completion for the provided prompt, parameters and chosen model.",
         "operationId": "Completions_Create",
-        "tags": [
-          "Completions"
-        ],
         "parameters": [
           {
             "in": "path",
@@ -200,9 +199,6 @@
       "post": {
         "description": "Get a vector representation of a given input that can be easily consumed by machine learning models and algorithms.",
         "operationId": "Embeddings_Create",
-        "tags": [
-          "Embeddings"
-        ],
         "parameters": [
           {
             "in": "path",
@@ -367,9 +363,6 @@
       "post": {
         "description": "Creates a completion for the chat message",
         "operationId": "ChatCompletions_Create",
-        "tags": [
-          "Chat"
-        ],
         "parameters": [
           {
             "in": "path",
@@ -492,9 +485,6 @@
     "/deployments/{deployment-id}/audio/transcriptions": {
       "post": {
         "description": "Transcribes audio into the input language.",
-        "tags": [
-          "Audio"
-        ],
         "operationId": "Transcriptions_Create",
         "parameters": [
           {
@@ -568,9 +558,6 @@
     "/deployments/{deployment-id}/audio/translations": {
       "post": {
         "description": "Transcribes and translates input audio into English text.",
-        "tags": [
-          "Audio"
-        ],
         "operationId": "Translations_Create",
         "parameters": [
           {
@@ -644,9 +631,6 @@
     "/deployments/{deployment-id}/audio/speech": {
       "post": {
         "description": "Generates audio from the input text.",
-        "tags": [
-          "Audio"
-        ],
         "operationId": "Speech_Create",
         "parameters": [
           {
@@ -705,9 +689,6 @@
     "/deployments/{deployment-id}/images/generations": {
       "post": {
         "description": "Generates a batch of images from a text caption on a given DALLE model deployment",
-        "tags": [
-          "Images"
-        ],
         "operationId": "ImageGenerations_Create",
         "requestBody": {
           "required": true,
@@ -775,9 +756,6 @@
     "/assistants": {
       "get": {
         "operationId": "List_Assistants",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Returns a list of assistants.",
         "parameters": [
           {
@@ -866,9 +844,6 @@
       },
       "post": {
         "operationId": "Create_Assistant",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Create an assistant with a model and instructions.",
         "parameters": [
           {
@@ -916,9 +891,6 @@
     "/assistants/{assistant_id}": {
       "get": {
         "operationId": "Get_Assistant",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Retrieves an assistant.",
         "parameters": [
           {
@@ -963,9 +935,6 @@
       },
       "post": {
         "operationId": "Modify_Assistant",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Modifies an assistant.",
         "parameters": [
           {
@@ -1020,9 +989,6 @@
       },
       "delete": {
         "operationId": "Delete_Assistant",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Delete an assistant.",
         "parameters": [
           {
@@ -1069,9 +1035,6 @@
     "/threads": {
       "post": {
         "operationId": "Create_Thread",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Create a thread.",
         "parameters": [
           {
@@ -1119,9 +1082,6 @@
     "/threads/{thread_id}": {
       "get": {
         "operationId": "Get_Thread",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Retrieves a thread.",
         "parameters": [
           {
@@ -1166,9 +1126,6 @@
       },
       "post": {
         "operationId": "Modify_Thread",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Modifies a thread.",
         "parameters": [
           {
@@ -1223,9 +1180,6 @@
       },
       "delete": {
         "operationId": "Delete_Thread",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Delete a thread.",
         "parameters": [
           {
@@ -1272,9 +1226,6 @@
     "/threads/{thread_id}/messages": {
       "get": {
         "operationId": "List_Messages",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Returns a list of messages for a given thread.",
         "parameters": [
           {
@@ -1380,9 +1331,6 @@
       },
       "post": {
         "operationId": "Create_Message",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Create a message.",
         "parameters": [
           {
@@ -1439,9 +1387,6 @@
     "/threads/{thread_id}/messages/{message_id}": {
       "get": {
         "operationId": "Get_Message",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Retrieve a message.",
         "parameters": [
           {
@@ -1495,9 +1440,6 @@
       },
       "post": {
         "operationId": "Modify_Message",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Modifies a message.",
         "parameters": [
           {
@@ -1563,9 +1505,6 @@
     "/threads/runs": {
       "post": {
         "operationId": "Create_Thread_And_Run",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Create a thread and run it in one request.",
         "parameters": [
           {
@@ -1613,9 +1552,6 @@
     "/threads/{thread_id}/runs": {
       "get": {
         "operationId": "List_Runs",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Returns a list of runs belonging to a thread.",
         "parameters": [
           {
@@ -1713,9 +1649,6 @@
       },
       "post": {
         "operationId": "Create_Run",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Create a run.",
         "parameters": [
           {
@@ -1795,9 +1728,6 @@
     "/threads/{thread_id}/runs/{run_id}": {
       "get": {
         "operationId": "Get_Run",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Retrieves a run.",
         "parameters": [
           {
@@ -1851,9 +1781,6 @@
       },
       "post": {
         "operationId": "Modify_Run",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Modifies a run.",
         "parameters": [
           {
@@ -1919,9 +1846,6 @@
     "/threads/{thread_id}/runs/{run_id}/submit_tool_outputs": {
       "post": {
         "operationId": "Submit_Tool_Outputs_To_Run",
-        "tags": [
-          "Assistants"
-        ],
         "description": "When a run has the `status: \"requires_action\"` and `required_action.type` is `submit_tool_outputs`, this endpoint can be used to submit the outputs from the tool calls once they're all completed. All outputs must be submitted in a single request.\n",
         "parameters": [
           {
@@ -1987,9 +1911,6 @@
     "/threads/{thread_id}/runs/{run_id}/cancel": {
       "post": {
         "operationId": "Cancel_Run",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Cancels a run that is `in_progress`.",
         "parameters": [
           {
@@ -2045,9 +1966,6 @@
     "/threads/{thread_id}/runs/{run_id}/steps": {
       "get": {
         "operationId": "List_Run_Steps",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Returns a list of run steps belonging to a run.",
         "parameters": [
           {
@@ -2179,9 +2097,6 @@
     "/threads/{thread_id}/runs/{run_id}/steps/{step_id}": {
       "get": {
         "operationId": "Get_Run_Step",
-        "tags": [
-          "Assistants"
-        ],
         "description": "Retrieves a run step.",
         "parameters": [
           {
@@ -2269,9 +2184,6 @@
     "/vector_stores": {
       "get": {
         "operationId": "List_Vector_Stores",
-        "tags": [
-          "Vector Stores"
-        ],
         "description": "Returns a list of vector stores.",
         "parameters": [
           {
@@ -2358,9 +2270,6 @@
       },
       "post": {
         "operationId": "Create_Vector_Store",
-        "tags": [
-          "Vector Stores"
-        ],
         "description": "Create a vector store.",
         "requestBody": {
           "required": true,
@@ -2408,9 +2317,6 @@
     "/vector_stores/{vector_store_id}": {
       "get": {
         "operationId": "Get_Vector_Store",
-        "tags": [
-          "Vector Stores"
-        ],
         "description": "Retrieves a vector store.",
         "parameters": [
           {
@@ -2455,9 +2361,6 @@
       },
       "post": {
         "operationId": "Modify_Vector_Store",
-        "tags": [
-          "Vector Stores"
-        ],
         "description": "Modifies a vector store.",
         "parameters": [
           {
@@ -2512,9 +2415,6 @@
       },
       "delete": {
         "operationId": "Delete_Vector_Store",
-        "tags": [
-          "Vector Stores"
-        ],
         "description": "Delete a vector store.",
         "parameters": [
           {
@@ -2561,9 +2461,6 @@
     "/vector_stores/{vector_store_id}/files": {
       "get": {
         "operationId": "List_Vector_Store_Files",
-        "tags": [
-          "Vector Stores"
-        ],
         "description": "Returns a list of vector store files.",
         "parameters": [
           {
@@ -2691,9 +2588,6 @@
       },
       "post": {
         "operationId": "Create_Vector_Store_File",
-        "tags": [
-          "Vector Stores"
-        ],
         "description": "Create a vector store file by attaching a [File](/docs/api-reference/files) to a [vector store](/docs/api-reference/vector-stores/object).",
         "parameters": [
           {
@@ -2751,9 +2645,6 @@
     "/vector_stores/{vector_store_id}/files/{file_id}": {
       "get": {
         "operationId": "Get_Vector_Store_File",
-        "tags": [
-          "Vector Stores"
-        ],
         "description": "Retrieves a vector store file.",
         "parameters": [
           {
@@ -2809,9 +2700,6 @@
       },
       "delete": {
         "operationId": "Delete_Vector_Store_File",
-        "tags": [
-          "Vector Stores"
-        ],
         "description": "Delete a vector store file. This will remove the file from the vector store but the file itself will not be deleted. To delete the file, use the [delete file](/docs/api-reference/files/delete) endpoint.",
         "parameters": [
           {
@@ -2865,9 +2753,6 @@
       },
       "post": {
         "operationId": "Update_Vector_Store_File_Attributes",
-        "tags": [
-          "Vector stores"
-        ],
         "description": "Update attributes on a vector store file.",
         "parameters": [
           {
@@ -2919,9 +2804,6 @@
     "/vector_stores/{vector_store_id}/files/{file_id}/content": {
       "get": {
         "operationId": "Retrieve_Vector_Store_File_Content",
-        "tags": [
-          "Vector stores"
-        ],
         "description": "Retrieve the parsed contents of a vector store file.",
         "parameters": [
           {
@@ -2963,9 +2845,6 @@
     "/vector_stores/{vector_store_id}/search": {
       "post": {
         "operationId": "Search_Vector_Store",
-        "tags": [
-          "Vector stores"
-        ],
         "description": "Search a vector store for relevant chunks based on a query and file attributes filter.",
         "parameters": [
           {
@@ -3007,9 +2886,6 @@
     "/vector_stores/{vector_store_id}/file_batches": {
       "post": {
         "operationId": "Create_Vector_Store_File_Batch",
-        "tags": [
-          "Vector Stores"
-        ],
         "description": "Create a vector store file batch.",
         "parameters": [
           {
@@ -3067,9 +2943,6 @@
     "/vector_stores/{vector_store_id}/file_batches/{batch_id}": {
       "get": {
         "operationId": "Get_Vector_Store_File_Batch",
-        "tags": [
-          "Vector Stores"
-        ],
         "description": "Retrieves a vector store file batch.",
         "parameters": [
           {
@@ -3127,9 +3000,6 @@
     "/vector_stores/{vector_store_id}/file_batches/{batch_id}/cancel": {
       "post": {
         "operationId": "Cancel_Vector_Store_File_Batch",
-        "tags": [
-          "Vector Stores"
-        ],
         "description": "Cancel a vector store file batch. This attempts to cancel the processing of files in this batch as soon as possible.",
         "parameters": [
           {
@@ -3185,9 +3055,6 @@
     "/vector_stores/{vector_store_id}/file_batches/{batch_id}/files": {
       "get": {
         "operationId": "List_Vector_Store_File_Batch_Files",
-        "tags": [
-          "Vector Stores"
-        ],
         "description": "Returns a list of vector store files in a batch.",
         "parameters": [
           {
@@ -3327,9 +3194,6 @@
       "post": {
         "operationId": "Create_Response",
         "description": "Creates a model response. Provide [text](/docs/guides/text) or\n[image](/docs/guides/images) inputs to generate [text](/docs/guides/text)\nor [JSON](/docs/guides/structured-outputs) outputs. Have the model call\nyour own [custom code](/docs/guides/function-calling) or use built-in\n[tools](/docs/guides/tools) like [web search](/docs/guides/tools-web-search)\nor [file search](/docs/guides/tools-file-search) to use your own data\nas input for the model's response.\n",
-        "tags": [
-          "Responses"
-        ],
         "parameters": [
           {
             "in": "query",
@@ -3400,9 +3264,6 @@
       "get": {
         "operationId": "Get_Response",
         "description": "Retrieves a model response with the given ID.\n",
-        "tags": [
-          "Responses"
-        ],
         "parameters": [
           {
             "in": "path",
@@ -3460,9 +3321,6 @@
       },
       "delete": {
         "operationId": "Delete_Response",
-        "tags": [
-          "Responses"
-        ],
         "description": "Deletes a model response with the given ID.\n",
         "parameters": [
           {
@@ -3516,9 +3374,6 @@
       "get": {
         "operationId": "Get_Input_Items",
         "description": "Returns a list of input items for a given response.",
-        "tags": [
-          "Responses"
-        ],
         "parameters": [
           {
             "in": "path",
@@ -7645,9 +7500,9 @@
           "speed": {
             "description": "The speed of the synthesize audio. Select a value from `0.25` to `4.0`. `1.0` is the default.",
             "type": "number",
-            "default": 1.0,
+            "default": 1,
             "minimum": 0.25,
-            "maximum": 4.0
+            "maximum": 4
           }
         },
         "required": [
