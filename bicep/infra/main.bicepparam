@@ -57,6 +57,7 @@ param existingVnetRG = readEnvironmentVariable('EXISTING_VNET_RG', '')
 // Subnet names
 param apimSubnetName = readEnvironmentVariable('APIM_SUBNET_NAME', '')
 param privateEndpointSubnetName = readEnvironmentVariable('PRIVATE_ENDPOINT_SUBNET_NAME', '')
+param storagePrivateEndpointSubnetName = readEnvironmentVariable('STORAGE_PRIVATE_ENDPOINT_SUBNET_NAME', '')
 param functionAppSubnetName = readEnvironmentVariable('FUNCTION_APP_SUBNET_NAME', '')
 param agentSubnetName = readEnvironmentVariable('AGENT_SUBNET_NAME', '')
 

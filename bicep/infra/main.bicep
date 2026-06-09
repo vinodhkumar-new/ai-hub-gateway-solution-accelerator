@@ -112,6 +112,9 @@ param apimSubnetName string = ''
 @description('Subnet name for Private Endpoints in the VNet. Leave blank to use default naming conventions.')
 param privateEndpointSubnetName string = ''
 
+@description('Subnet name for Storage private endpoints. Leave blank to use the default private endpoint subnet.')
+param storagePrivateEndpointSubnetName string = ''
+
 @description('Subnet name for Function/Logic App in the VNet. Leave blank to use default naming conventions.')
 param functionAppSubnetName string = ''
 
@@ -1060,7 +1063,7 @@ module storageAccount './modules/functionapp/storageaccount.bicep' = {
     storageAccountName: !empty(storageAccountName) ? storageAccountName : 'funcusage${resourceToken}'
     functionAppManagedIdentityName: usageManagedIdentity.outputs.managedIdentityName
     vNetName: useExistingVnet ? vnetExisting.outputs.vnetName : vnet.outputs.vnetName
-    privateEndpointSubnetName: useExistingVnet ? vnetExisting.outputs.privateEndpointSubnetName : vnet.outputs.privateEndpointSubnetName
+    privateEndpointSubnetName: useExistingVnet ? (!empty(storagePrivateEndpointSubnetName) ? storagePrivateEndpointSubnetName : vnetExisting.outputs.privateEndpointSubnetName) : vnet.outputs.privateEndpointSubnetName
     privateEndpointLocation: useExistingVnet ? vnetExisting.outputs.location : vnet.outputs.location
     storageBlobDnsZoneName: storageBlobPrivateDnsZoneName
     storageFileDnsZoneName: storageFilePrivateDnsZoneName
