@@ -7,8 +7,13 @@ param environmentName = readEnvironmentVariable('AZURE_ENV_NAME', 'citadel-dev')
 param location = readEnvironmentVariable('AZURE_LOCATION', 'swedencentral')
 param apicLocation = readEnvironmentVariable('APIC_LOCATION', 'swedencentral')
 param tags = {
-  'azd-env-name': readEnvironmentVariable('AZURE_ENV_NAME', 'citadel-dev')
-  SecurityControl: 'Ignore'
+  Environment: readEnvironmentVariable('AZURE_ENV_NAME', 'citadel-dev')
+  BCHOCostCenter: '960.71.1252518'
+  Classification: 'Medium'
+  OwnerBCHO: 'FHA'
+  Project: 'AI Hub'
+  ServiceOwner: 'fhenterpriseintegrationapim@fraserhealth.ca'
+  SolutionName: 'FH.APIM.AIHub'
 }
 
 // ============================================================================
@@ -168,6 +173,7 @@ param appInsightsLogSettings = {
 param apimSku = readEnvironmentVariable('APIM_SKU', 'StandardV2')
 param apimSkuUnits = int(readEnvironmentVariable('APIM_SKU_UNITS', '1'))
 param eventHubCapacityUnits = int(readEnvironmentVariable('EVENTHUB_CAPACITY', '1'))
+param eventHubZoneRedundant = bool(readEnvironmentVariable('EVENTHUB_ZONE_REDUNDANT', 'true'))
 param cosmosDbRUs = int(readEnvironmentVariable('COSMOS_DB_RUS', '400'))
 param logicAppsSkuCapacityUnits = int(readEnvironmentVariable('LOGIC_APPS_SKU_CAPACITY_UNITS', '1'))
 param apicSku = readEnvironmentVariable('APIC_SKU', 'Free')
@@ -198,7 +204,7 @@ param aiFoundryInstances = [
   }
   {
     name: readEnvironmentVariable('AI_FOUNDRY_RESOURCE_NAME', '')
-    location: 'eastus2'
+    location: readEnvironmentVariable('SECONDARY_AI_FOUNDRY_LOCATION', 'canadaeast')
     customSubDomainName: ''
     defaultProjectName: 'citadel-governance-project'
     networkInjectionEnabled: false

@@ -7,6 +7,7 @@ param functionAppManagedIdentityName string
 //Networking
 param vNetName string
 param privateEndpointSubnetName string
+param privateEndpointLocation string = location
 param storageBlobDnsZoneName string
 param storageBlobPrivateEndpointName string
 param storageFileDnsZoneName string
@@ -103,7 +104,7 @@ module privateEndpointBlob '../networking/private-endpoint.bicep' = {
     dnsZoneName: storageBlobDnsZoneName
     name: storageBlobPrivateEndpointName
     privateLinkServiceId: storageAccount.id
-    location: location
+    location: privateEndpointLocation
     dnsZoneRG: dnsZoneRG
     privateEndpointSubnetId: subnet.id
     dnsSubId: dnsSubscriptionId
@@ -120,7 +121,7 @@ module privateEndpointFile '../networking/private-endpoint.bicep' = {
     dnsZoneName: storageFileDnsZoneName
     name: storageFilePrivateEndpointName
     privateLinkServiceId: storageAccount.id
-    location: location
+    location: privateEndpointLocation
     dnsZoneRG: dnsZoneRG
     privateEndpointSubnetId: subnet.id
     dnsSubId: dnsSubscriptionId
@@ -137,7 +138,7 @@ module privateEndpointTable '../networking/private-endpoint.bicep' = {
     dnsZoneName: storageTableDnsZoneName
     name: storageTablePrivateEndpointName
     privateLinkServiceId: storageAccount.id
-    location: location
+    location: privateEndpointLocation
     dnsZoneRG: dnsZoneRG
     privateEndpointSubnetId: subnet.id
     dnsSubId: dnsSubscriptionId
@@ -154,7 +155,7 @@ module privateEndpointQueue '../networking/private-endpoint.bicep' = {
     dnsZoneName: storageQueueDnsZoneName
     name: storageQueuePrivateEndpointName
     privateLinkServiceId: storageAccount.id
-    location: location
+    location: privateEndpointLocation
     dnsZoneRG: dnsZoneRG
     privateEndpointSubnetId: subnet.id
     dnsSubId: dnsSubscriptionId

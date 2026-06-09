@@ -311,6 +311,9 @@ param apimSkuUnits int = 1
 @description('Event Hub capacity units.')
 param eventHubCapacityUnits int = 1
 
+@description('Enable zone redundancy for the Event Hub namespace.')
+param eventHubZoneRedundant bool = true
+
 @description('Cosmos DB throughput in Request Units (RUs).')
 param cosmosDbRUs int = 400
 
@@ -427,7 +430,7 @@ param aiFoundryInstances array = [
   }
   {
     name: !empty(aiFoundryResourceName) ? aiFoundryResourceName : ''
-    location: 'eastus2'
+    location: location
     customSubDomainName: ''
     defaultProjectName: 'citadel-governance-project'
     networkInjectionEnabled: false
@@ -832,6 +835,7 @@ module monitoring './modules/monitor/monitoring.bicep' = {
     vNetName: useExistingVnet ? vnetExisting.outputs.vnetName : vnet.outputs.vnetName
     vNetRG: useExistingVnet ? vnetExisting.outputs.vnetRG : vnet.outputs.vnetRG
     privateEndpointSubnetName: useExistingVnet ? vnetExisting.outputs.privateEndpointSubnetName : vnet.outputs.privateEndpointSubnetName
+    privateEndpointLocation: useExistingVnet ? vnetExisting.outputs.location : vnet.outputs.location
     applicationInsightsDnsZoneName: monitorPrivateDnsZoneName
     createDashboard: createAppInsightsDashboards
     dnsZoneRG: !useExistingVnet ? resourceGroup.name : dnsZoneRG
@@ -852,6 +856,7 @@ module keyVault './modules/keyvault/keyvault.bicep' = {
     publicNetworkAccess: keyVaultExternalNetworkAccess
     vNetName: useExistingVnet ? vnetExisting.outputs.vnetName : vnet.outputs.vnetName
     privateEndpointSubnetName: useExistingVnet ? vnetExisting.outputs.privateEndpointSubnetName : vnet.outputs.privateEndpointSubnetName
+    privateEndpointLocation: useExistingVnet ? vnetExisting.outputs.location : vnet.outputs.location
     vNetRG: useExistingVnet ? vnetExisting.outputs.vnetRG : vnet.outputs.vnetRG
     keyVaultPrivateEndpointName: !empty(keyVaultPrivateEndpointName) ? keyVaultPrivateEndpointName : '${abbrs.keyVaultVaults}pe-${resourceToken}'
     keyVaultDnsZoneName: keyVaultPrivateDnsZoneName
@@ -911,6 +916,7 @@ module eventHub './modules/event-hub/event-hub.bicep' = {
     eventHubPrivateEndpointName: !empty(eventHubPrivateEndpointName) ? eventHubPrivateEndpointName : '${abbrs.eventHubNamespaces}pe-${resourceToken}'
     vNetName: useExistingVnet ? vnetExisting.outputs.vnetName : vnet.outputs.vnetName
     privateEndpointSubnetName: useExistingVnet ? vnetExisting.outputs.privateEndpointSubnetName : vnet.outputs.privateEndpointSubnetName
+    privateEndpointLocation: useExistingVnet ? vnetExisting.outputs.location : vnet.outputs.location
     eventHubDnsZoneName: eventHubPrivateDnsZoneName
     publicNetworkAccess: eventHubNetworkAccess
     vNetRG: useExistingVnet ? vnetExisting.outputs.vnetRG : vnet.outputs.vnetRG
@@ -918,6 +924,7 @@ module eventHub './modules/event-hub/event-hub.bicep' = {
     dnsSubscriptionId: !empty(dnsSubscriptionId) ? dnsSubscriptionId : subscription().subscriptionId
     dnsZoneResourceId: existingEventHubDnsZoneId
     capacity: eventHubCapacityUnits
+    zoneRedundant: eventHubZoneRedundant
   }
 }
 
@@ -936,6 +943,7 @@ module managedRedis './modules/redis/redis.bicep' = if (enableManagedRedis) {
     redisPrivateEndpointName: !empty(redisPrivateEndpointName) ? redisPrivateEndpointName : '${abbrs.cacheRedis}pe-${resourceToken}'
     vNetName: useExistingVnet ? vnetExisting.outputs.vnetName : vnet.outputs.vnetName
     privateEndpointSubnetName: useExistingVnet ? vnetExisting.outputs.privateEndpointSubnetName : vnet.outputs.privateEndpointSubnetName
+    privateEndpointLocation: useExistingVnet ? vnetExisting.outputs.location : vnet.outputs.location
     vNetRG: useExistingVnet ? vnetExisting.outputs.vnetRG : vnet.outputs.vnetRG
     redisDnsZoneName: redisPrivateDnsZoneName
     dnsZoneRG: !useExistingVnet ? resourceGroup.name : dnsZoneRG
@@ -974,7 +982,7 @@ module apim './modules/apim/apim.bicep' = {
   scope: resourceGroup
   params: {
     name: !empty(apimServiceName) ? apimServiceName : '${abbrs.apiManagementService}${resourceToken}'
-    location: location
+    location: useExistingVnet ? vnetExisting.outputs.location : location
     tags: tags
     applicationInsightsName: monitoring.outputs.apimApplicationInsightsName
     managedIdentityName: apimManagedIdentity.outputs.managedIdentityName
@@ -1008,6 +1016,7 @@ module apim './modules/apim/apim.bicep' = {
     apimV2PrivateEndpointName: !empty(apimV2PrivateEndpointName) ? apimV2PrivateEndpointName : '${abbrs.apiManagementService}pe-${resourceToken}'
     apimV2PublicNetworkAccess: apimV2PublicNetworkAccess
     privateEndpointSubnetId: useExistingVnet ? vnetExisting.outputs.privateEndpointSubnetId : vnet.outputs.privateEndpointSubnetId
+    privateEndpointLocation: useExistingVnet ? vnetExisting.outputs.location : vnet.outputs.location
     dnsZoneRG: !useExistingVnet ? resourceGroup.name : dnsZoneRG
     dnsSubscriptionId: !empty(dnsSubscriptionId) ? dnsSubscriptionId : subscription().subscriptionId
     dnsZoneResourceId: existingApimGatewayDnsZoneId
@@ -1032,6 +1041,7 @@ module cosmosDb './modules/cosmos-db/cosmos-db.bicep' = {
     cosmosDnsZoneName: cosmosDbPrivateDnsZoneName
     cosmosPrivateEndpointName: !empty(cosmosDbPrivateEndpointName) ? cosmosDbPrivateEndpointName : '${abbrs.documentDBDatabaseAccounts}pe-${resourceToken}'
     privateEndpointSubnetName: useExistingVnet ? vnetExisting.outputs.privateEndpointSubnetName : vnet.outputs.privateEndpointSubnetName
+    privateEndpointLocation: useExistingVnet ? vnetExisting.outputs.location : vnet.outputs.location
     vNetRG: useExistingVnet ? vnetExisting.outputs.vnetRG : vnet.outputs.vnetRG
     dnsZoneRG: !useExistingVnet ? resourceGroup.name : dnsZoneRG
     dnsSubscriptionId: !empty(dnsSubscriptionId) ? dnsSubscriptionId : subscription().subscriptionId
@@ -1051,6 +1061,7 @@ module storageAccount './modules/functionapp/storageaccount.bicep' = {
     functionAppManagedIdentityName: usageManagedIdentity.outputs.managedIdentityName
     vNetName: useExistingVnet ? vnetExisting.outputs.vnetName : vnet.outputs.vnetName
     privateEndpointSubnetName: useExistingVnet ? vnetExisting.outputs.privateEndpointSubnetName : vnet.outputs.privateEndpointSubnetName
+    privateEndpointLocation: useExistingVnet ? vnetExisting.outputs.location : vnet.outputs.location
     storageBlobDnsZoneName: storageBlobPrivateDnsZoneName
     storageFileDnsZoneName: storageFilePrivateDnsZoneName
     storageTableDnsZoneName: storageTablePrivateDnsZoneName
@@ -1074,7 +1085,7 @@ module logicApp './modules/logicapp/logicapp.bicep' = {
   name: 'usageLogicApp'
   scope: resourceGroup
   params: {
-    location: location
+    location: useExistingVnet ? vnetExisting.outputs.location : location
     tags: tags
     logicAppName: !empty(usageProcessingLogicAppName) ? usageProcessingLogicAppName : '${abbrs.logicWorkflows}usage-${resourceToken}'
     azdserviceName: 'usageProcessingLogicApp'   

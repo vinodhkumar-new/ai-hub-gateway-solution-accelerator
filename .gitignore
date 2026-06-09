@@ -418,6 +418,7 @@ infra/usecase-onboarding/samples/financial-assistant-usecase-local.sh
 **/.temp/*
 .venv/**
 validation-local/**
+progress/
 bicep/infra/citadel-access-contracts/contracts
 bicep/infra/citadel-access-contracts/contracts/testing-unifiedai/dev/main.bicepparam
 bicep/infra/citadel-access-contracts/contracts/testing-unifiedai/dev/ai-product-policy.xml

@@ -90,6 +90,7 @@ var locations = [
 param cosmosPrivateEndpointName string
 param vNetName string
 param privateEndpointSubnetName string
+param privateEndpointLocation string = location
 param cosmosDnsZoneName string
 param publicAccess string = 'Disabled'
 
@@ -261,7 +262,7 @@ module privateEndpoint '../networking/private-endpoint.bicep' = {
     dnsZoneName: cosmosDnsZoneName
     name: cosmosPrivateEndpointName
     privateLinkServiceId: account.id
-    location: location
+    location: privateEndpointLocation
     dnsZoneRG: dnsZoneRG
     privateEndpointSubnetId: subnet.id
     dnsSubId: dnsSubscriptionId

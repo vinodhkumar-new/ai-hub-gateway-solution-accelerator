@@ -48,6 +48,7 @@ param apimV2PrivateEndpointName string
 param dnsZoneRG string = ''
 param dnsSubscriptionId string = ''
 param privateEndpointSubnetId string
+param privateEndpointLocation string = location
 param usePrivateEndpoint bool = false
 param apimV2PublicNetworkAccess bool = true
 
@@ -224,7 +225,7 @@ module privateEndpoint '../networking/private-endpoint.bicep' = if (isV2SKU && u
     dnsZoneName: apimV2PrivateDnsZoneName
     name: apimV2PrivateEndpointName
     privateLinkServiceId: apimService.id
-    location: location
+    location: privateEndpointLocation
     dnsZoneRG: dnsZoneRG
     privateEndpointSubnetId: privateEndpointSubnetId
     dnsSubId: dnsSubscriptionId

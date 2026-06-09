@@ -12,6 +12,7 @@ param eventHubNamePII string = 'pii-usage'
 param eventHubPrivateEndpointName string
 param vNetName string
 param privateEndpointSubnetName string
+param privateEndpointLocation string = location
 param eventHubDnsZoneName string
 param publicNetworkAccess string = 'Enabled'
 
@@ -117,7 +118,7 @@ module privateEndpoint '../networking/private-endpoint.bicep' = {
     dnsZoneName: eventHubDnsZoneName
     name: eventHubPrivateEndpointName
     privateLinkServiceId: eventHubNamespace.id
-    location: location
+    location: privateEndpointLocation
     dnsZoneRG: dnsZoneRG
     privateEndpointSubnetId: subnet.id
     dnsSubId: dnsSubscriptionId

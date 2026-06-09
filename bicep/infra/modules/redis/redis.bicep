@@ -87,6 +87,9 @@ param vNetName string
 @description('Name of the private endpoint subnet')
 param privateEndpointSubnetName string
 
+@description('Location for the private endpoint. Must match the virtual network location.')
+param privateEndpointLocation string = location
+
 @description('Resource group containing the Virtual Network')
 param vNetRG string
 
@@ -161,7 +164,7 @@ module privateEndpoint '../networking/private-endpoint.bicep' = if (usePrivateEn
     dnsZoneName: redisDnsZoneName
     name: redisPrivateEndpointName
     privateLinkServiceId: redis.id
-    location: location
+    location: privateEndpointLocation
     dnsZoneRG: dnsZoneRG
     privateEndpointSubnetId: subnet.id
     dnsSubId: dnsSubscriptionId

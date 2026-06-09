@@ -19,6 +19,7 @@ param usePrivateLinkScope bool = true
 var privateLinkScopeName = 'ampls-monitoring'
 param vNetName string
 param privateEndpointSubnetName string
+param privateEndpointLocation string = location
 param applicationInsightsDnsZoneName string
 
 // Use existing network/dns zone - Legacy parameters (used when dnsZoneResourceId is not provided)
@@ -115,7 +116,7 @@ module privateEndpoint '../networking/private-endpoint.bicep' = if (usePrivateLi
     dnsZoneName: applicationInsightsDnsZoneName
     name: '${privateLinkScopeName}-pe'
     privateLinkServiceId: privateLinkScope.id
-    location: location
+    location: privateEndpointLocation
     dnsZoneRG: dnsZoneRG
     privateEndpointSubnetId: subnet.id
     dnsSubId: dnsSubscriptionId
