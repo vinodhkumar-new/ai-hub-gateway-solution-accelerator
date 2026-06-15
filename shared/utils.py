@@ -82,9 +82,11 @@ def azd_env_get(var_name, default=None):
     call works on Windows / macOS / Linux without leaking subprocess plumbing into the notebook.
     """
     try:
+        # Invoke azd.exe directly (no shell): endpoint-security hooks on cmd.exe can
+        # black-hole piped output, and shell=True with an args list is broken on POSIX.
         result = subprocess.run(
             ["azd", "env", "get-value", var_name],
-            capture_output=True, text=True, check=False, shell=True,
+            capture_output=True, text=True, check=False,
         )
         if result.returncode == 0 and result.stdout.strip():
             return result.stdout.strip()
@@ -379,17 +381,41 @@ def run(command, ok_message = '', error_message = '', print_output = False, prin
     start_time = time.time()
 
     try:
-        completed_process = subprocess.run(
-            command,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-        )
-        output_text = completed_process.stdout or ""
-        stderr_text = completed_process.stderr or ""
+        if os.name == "nt":
+            # Endpoint-security hooks (e.g. Ivanti Application Control) can black-hole
+            # any stdout/stderr handle inherited by cmd.exe, so piped output comes back
+            # empty. Files opened by cmd's own `>` redirection are unaffected, so
+            # capture through temp files instead of pipes.
+            import tempfile
+            out_path = tempfile.NamedTemporaryFile(delete=False, suffix=".out").name
+            err_path = tempfile.NamedTemporaryFile(delete=False, suffix=".err").name
+            try:
+                completed_process = subprocess.run(
+                    f'{command} 1>"{out_path}" 2>"{err_path}"',
+                    shell=True,
+                )
+                with open(out_path, encoding="utf-8", errors="replace") as f:
+                    output_text = f.read()
+                with open(err_path, encoding="utf-8", errors="replace") as f:
+                    stderr_text = f.read()
+            finally:
+                for p in (out_path, err_path):
+                    try:
+                        os.unlink(p)
+                    except OSError:
+                        pass
+        else:
+            completed_process = subprocess.run(
+                command,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+            )
+            output_text = completed_process.stdout or ""
+            stderr_text = completed_process.stderr or ""
         success = completed_process.returncode == 0
     except subprocess.CalledProcessError as e:
         output_text = e.output.decode("utf-8", errors="replace") if isinstance(e.output, (bytes, bytearray)) else (e.output or "")
