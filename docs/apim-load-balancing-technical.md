@@ -151,6 +151,105 @@ Note: pool names strip dots from model names (`gpt-5.4-mini` → `gpt-54-mini-ba
 
 ---
 
+## Bridge — How `requestedModel` Is Extracted
+
+Before alias resolution or backend pool routing can happen, the gateway must know **which model the client is asking for**. This is the job of the `set-llm-requested-model` fragment, which runs first in the inbound pipeline.
+
+The model name can be in three different places depending on which API the client uses. The fragment tries them in order:
+
+```mermaid
+flowchart TD
+    Start["Incoming Request"]
+    M{"HTTP Method?"}
+    NonLLM["requestedModel = 'non-llm-request'\nSkips all downstream routing\nGET /deployments or DELETE /responses"]
+
+    P1["Method 1 — Named path parameter\ndeployment-id from APIM route template\nAzure OpenAI API"]
+    P2["Method 2 — URL path parsing\nslice segment after /deployments/\nUnified AI wildcard routes"]
+    P3["Method 3 — Request body\nbody.model field\nUniversal LLM / Inference API"]
+    ERR["Return 400 Bad Request\nmissing_model_parameter"]
+    Done["requestedModel = extracted value\npassed to next fragment"]
+
+    Start --> M
+    M -->|"GET or DELETE"| NonLLM
+    M -->|"POST / PATCH"| P1
+    P1 -->|"deployment-id found"| Done
+    P1 -->|"not found"| P2
+    P2 -->|"segment found"| Done
+    P2 -->|"not found"| P3
+    P3 -->|"body.model found"| Done
+    P3 -->|"not found"| ERR
+```
+
+### Method 1 — Named path parameter (Azure OpenAI API)
+
+The Azure OpenAI API route is registered in APIM with a named template (`/openai/deployments/{deployment-id}/...`). APIM automatically parses the URL and populates `MatchedParameters["deployment-id"]`.
+
+```
+POST /openai/deployments/adv-gpt/chat/completions
+                          ↑↑↑↑↑↑↑
+                          APIM extracts this via route template
+                          requestedModel = "adv-gpt"
+```
+
+### Method 2 — URL path parsing (Unified AI wildcard routes)
+
+Unified AI uses wildcard routes with no named parameters. The code manually searches for `/deployments/` in the path and slices the next segment:
+
+```
+path = "/ai/deployments/adv-gpt/chat/completions"
+                         ↑↑↑↑↑↑↑
+                         sliced between /deployments/ and next /
+                         requestedModel = "adv-gpt"
+```
+
+### Method 3 — Request body (Universal LLM / Inference API)
+
+Universal LLM API has no model name in the URL — the model is in the JSON body:
+
+```
+POST /universalllm/chat/completions
+{ "model": "adv-gpt", "messages": [...] }
+        ↑↑↑↑↑↑↑↑↑
+        extracted from body.model
+        requestedModel = "adv-gpt"
+```
+
+### Validation gate
+
+If all three methods fail, APIM returns **400** immediately — the request never reaches alias resolution or a backend:
+
+```json
+{
+  "error": {
+    "code": "missing_model_parameter",
+    "message": "Model could not be detected from request body or path"
+  }
+}
+```
+
+### The `non-llm-request` sentinel
+
+`GET /openai/deployments` (listing models) and `DELETE /responses/{id}` have no model to route to. The fragment sets `requestedModel = "non-llm-request"`. Every downstream fragment checks for this sentinel and skips itself:
+
+```csharp
+// In resolve-model-alias (line 51):
+if (model.Equals("non-llm-request", ...)) return false;  // entire alias block skipped
+```
+
+### Variable handoff chain
+
+Every fragment in the inbound pipeline reads and writes `requestedModel` in sequence through `context.Variables`:
+
+```
+set-llm-requested-model   →  writes  requestedModel = "adv-gpt"
+resolve-model-alias        →  reads "adv-gpt", overwrites requestedModel = "gpt-5.2"
+set-backend-pools          →  reads "gpt-5.2", builds routing table
+set-target-backend-pool    →  reads "gpt-5.2", selects backend pool
+set-backend-authorization  →  reads selected backend, injects credentials
+```
+
+---
+
 ## Layer 2 — Model Alias Routing
 
 Model aliases are resolved inside the `resolve-model-alias` policy fragment. The alias map is **generated at Bicep compile time** and baked into the fragment as static C# code. No runtime lookup is needed.
@@ -238,33 +337,46 @@ From `llm-backends-generated-local.bicepparam`:
 
 ## Combined Routing — Full Decision Path
 
-A request for `ab-test-gpt` passes through both layers:
+A request for `ab-test-gpt` passes through all three stages. Using `POST /openai/deployments/ab-test-gpt/chat/completions` as the example:
 
 ```mermaid
 sequenceDiagram
     participant Client
-    participant Alias as resolve-model-alias fragment
+    participant Ext as set-llm-requested-model
+    participant Alias as resolve-model-alias
     participant Pool as Backend Pool
     participant B0 as aif-rylzjpdnxmm5o-0
     participant B1 as aif-rylzjpdnxmm5o-1
 
-    Client->>Alias: model = ab-test-gpt
+    Client->>Ext: POST /openai/deployments/ab-test-gpt/chat/completions
 
-    Note over Alias: Weighted random pick\n80% → gpt-5.4-mini\n20% → gpt-4.1
+    Note over Ext: Method 1 — named path parameter
+    Ext-->>Alias: requestedModel = "ab-test-gpt"
 
-    alt 80% of requests
-        Alias-->>Pool: requestedModel = gpt-5.4-mini
+    Note over Alias: Looks up ab-test-gpt in alias table\nweighted strategy weights [80, 20]
+
+    alt 80% of requests — pick 0–79
+        Alias-->>Pool: requestedModel = "gpt-5.4-mini"\nbody rewritten to model=gpt-5.4-mini
         Note over Pool: gpt-54-mini-backend-pool\nboth backends priority=1 weight=100
         Pool->>B0: 50% of gpt-5.4-mini requests
         Pool->>B1: 50% of gpt-5.4-mini requests
-    else 20% of requests
-        Alias-->>Pool: requestedModel = gpt-4.1
+    else 20% of requests — pick 80–99
+        Alias-->>Pool: requestedModel = "gpt-4.1"\nbody rewritten to model=gpt-4.1
         Note over Pool: gpt-4.1 → direct to backend-0 only
         Pool->>B0: 100% of gpt-4.1 requests
     end
 ```
 
-Overall traffic distribution for `ab-test-gpt`:
+### Context variable state at each stage
+
+| Stage | `requestedModel` | `original-model-alias` | `is-alias` |
+|---|---|---|---|
+| After `set-llm-requested-model` | `"ab-test-gpt"` | `""` | `false` |
+| After `resolve-model-alias` | `"gpt-5.4-mini"` or `"gpt-4.1"` | `"ab-test-gpt"` | `true` |
+| After `set-target-backend-pool` | unchanged | unchanged | unchanged |
+
+### Overall traffic distribution for `ab-test-gpt`
+
 - backend-0 receiving `gpt-5.4-mini`: 80% × 50% = **40%**
 - backend-1 receiving `gpt-5.4-mini`: 80% × 50% = **40%**
 - backend-0 receiving `gpt-4.1`: 20% × 100% = **20%**
