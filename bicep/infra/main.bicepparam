@@ -122,12 +122,12 @@ param createAppInsightsDashboards = bool(readEnvironmentVariable('CREATE_DASHBOA
 param enableAIModelInference = bool(readEnvironmentVariable('ENABLE_AI_MODEL_INFERENCE', 'true'))
 param enableDocumentIntelligence = bool(readEnvironmentVariable('ENABLE_DOCUMENT_INTELLIGENCE', 'false'))
 param enableAzureAISearch = bool(readEnvironmentVariable('ENABLE_AZURE_AI_SEARCH', 'false'))
-param enableAIGatewayPiiRedaction = bool(readEnvironmentVariable('ENABLE_PII_REDACTION', 'true'))
-param enableOpenAIRealtime = bool(readEnvironmentVariable('ENABLE_OPENAI_REALTIME', 'true'))
 param entraAuth = bool(readEnvironmentVariable('AZURE_ENTRA_AUTH', 'false'))
 param enableAPICenter = bool(readEnvironmentVariable('ENABLE_API_CENTER', 'false'))
 param enableManagedRedis = bool(readEnvironmentVariable('ENABLE_MANAGED_REDIS', 'false'))
 param enableUnifiedAiApi = bool(readEnvironmentVariable('ENABLE_UNIFIED_AI_API', 'true'))
+param enableAIGatewayPiiRedaction = bool(readEnvironmentVariable('ENABLE_PII_REDACTION', 'false'))
+param enableOpenAIRealtime = bool(readEnvironmentVariable('ENABLE_OPENAI_REALTIME', 'false'))
 
 // ============================================================================
 // INFERENCE API DIAGNOSTIC LOG SETTINGS
@@ -162,7 +162,7 @@ param appInsightsLogSettings = {
 // ============================================================================
 // COMPUTE SKU & SIZE - SKUs and capacity settings for services
 // ============================================================================
-param apimSku = readEnvironmentVariable('APIM_SKU', 'StandardV2')
+param apimSku = readEnvironmentVariable('APIM_SKU', 'Developer')
 param apimSkuUnits = int(readEnvironmentVariable('APIM_SKU_UNITS', '1'))
 param eventHubCapacityUnits = int(readEnvironmentVariable('EVENTHUB_CAPACITY', '1'))
 param cosmosDbRUs = int(readEnvironmentVariable('COSMOS_DB_RUS', '400'))
@@ -189,13 +189,7 @@ param aiSearchInstances = []
 param aiFoundryInstances = [
   {
     name: readEnvironmentVariable('AI_FOUNDRY_RESOURCE_NAME', '')
-    location: readEnvironmentVariable('AZURE_LOCATION', 'eastus')
-    customSubDomainName: ''
-    defaultProjectName: 'citadel-governance-project'
-  }
-  {
-    name: readEnvironmentVariable('AI_FOUNDRY_RESOURCE_NAME', '')
-    location: 'eastus2'
+    location: readEnvironmentVariable('AZURE_LOCATION', 'swedencentral')
     customSubDomainName: ''
     defaultProjectName: 'citadel-governance-project'
   }
@@ -208,109 +202,15 @@ param aiFoundryInstances = [
 //   - inferenceApiVersion: API version for inference-type requests (e.g., '2024-05-01-preview' for non-OpenAI models)
 param aiFoundryModelsConfig = [
   {
-    name: 'gpt-4.1'
+    name: 'gpt-4.1-mini'
     publisher: 'OpenAI'
     version: '2025-04-14'
     sku: 'GlobalStandard'
-    capacity: 100
+    capacity: 10
     retirementDate: '2026-10-14'
     apiVersion: '2025-04-01-preview'
     timeout: 180
     aiserviceIndex: 0
-  }
-  {
-    name: 'gpt-5.2'
-    publisher: 'OpenAI'
-    version: '2025-12-11'
-    sku: 'GlobalStandard'
-    capacity: 100
-    retirementDate: '2027-02-05'
-    aiserviceIndex: 0
-  }
-  {
-    name: 'gpt-image-1.5'
-    publisher: 'OpenAI'
-    version: '2025-12-16'
-    sku: 'GlobalStandard'
-    capacity: 2
-    retirementDate: '2026-12-16'
-    inferenceApiVersion: '2025-04-01-preview'
-    apiVersion: '2025-04-01-preview'
-    aiserviceIndex: 0
-  }
-  {
-    name: 'MAI-Image-2.5-Flash'
-    publisher: 'Microsoft'
-    version: '2026-06-02'
-    sku: 'GlobalStandard'
-    capacity: 1
-    retirementDate: '2026-09-01'
-    inferenceApiVersion: '2024-05-01-preview'
-    aiserviceIndex: 0
-  }
-  {
-    name: 'FLUX.2-pro'
-    publisher: 'Black Forest Labs'
-    version: '1'
-    sku: 'GlobalStandard'
-    capacity: 1
-    retirementDate: '2099-09-01'
-    inferenceApiVersion: '2024-05-01-preview'
-    aiserviceIndex: 0
-  }
-  {
-    name: 'text-embedding-3-large'
-    publisher: 'OpenAI'
-    version: '1'
-    sku: 'GlobalStandard'
-    capacity: 100
-    retirementDate: '2027-04-14'
-    aiserviceIndex: 0
-  }
-  {
-    name: 'Mistral-Large-3'
-    publisher: 'Mistral AI'
-    version: '1'
-    sku: 'GlobalStandard'
-    capacity: 100
-    retirementDate: '2099-12-30'
-    aiserviceIndex: 0
-  }
-  {
-    name: 'gpt-5.4-mini'
-    publisher: 'OpenAI'
-    version: '2026-03-17'
-    sku: 'GlobalStandard'
-    capacity: 100
-    retirementDate: '2026-09-30'
-    aiserviceIndex: 0
-  }
-  {
-    name: 'gpt-5.4-mini'
-    publisher: 'OpenAI'
-    version: '2026-03-17'
-    sku: 'GlobalStandard'
-    capacity: 100
-    retirementDate: '2026-09-30'
-    aiserviceIndex: 1
-  }
-  {
-    name: 'gpt-5.2'
-    publisher: 'OpenAI'
-    version: '2025-12-11'
-    sku: 'GlobalStandard'
-    capacity: 100
-    retirementDate: '2027-02-05'
-    aiserviceIndex: 1
-  }
-  {
-    name: 'text-embedding-3-large'
-    publisher: 'OpenAI'
-    version: '1'
-    sku: 'GlobalStandard'
-    capacity: 100
-    retirementDate: '2027-04-14'
-    aiserviceIndex: 1
   }
 ]
 
