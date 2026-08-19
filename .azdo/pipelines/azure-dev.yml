@@ -1,6 +1,6 @@
 # Run when commits are pushed to main
-trigger:
-  - main
+trigger: none
+pr: none
 
 pool:
   vmImage: ubuntu-latest
