@@ -144,7 +144,7 @@ param azureMonitorLogSettings = {
     response: { headers: [], body: { bytes: 0 } }
   }
   backend: {
-    request:  { headers: [], body: { bytes: 0 } }
+    request:  { headers: ['x-customer-id'], body: { bytes: 0 } }
     response: { headers: ['Content-type', 'User-agent', 'x-ms-region', 'x-ratelimit-remaining-tokens', 'x-ratelimit-remaining-requests'], body: { bytes: 0 } }
   }
   largeLanguageModel: {
@@ -157,7 +157,7 @@ param azureMonitorLogSettings = {
 // Application Insights diagnostic log settings for inference APIs
 // Controls which headers are captured and body byte limits (max 8192 bytes).
 param appInsightsLogSettings = {
-  headers: [ 'Content-type', 'User-agent', 'x-ms-region', 'x-ratelimit-remaining-tokens', 'x-ratelimit-remaining-requests' ]
+  headers: [ 'Content-type', 'User-agent', 'x-customer-id','x-ms-region', 'x-ratelimit-remaining-tokens', 'x-ratelimit-remaining-requests' ]
   body: { bytes: 8192 }
 }
 
