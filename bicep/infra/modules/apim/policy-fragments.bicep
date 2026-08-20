@@ -127,7 +127,7 @@ resource piiStateSavingPolicyFragment 'Microsoft.ApiManagement/service/policyFra
   }
 }
 
-resource aiFoundryCompatibilityPolicyFragment 'Microsoft.ApiManagement/service/policyFragments@2022-08-01' = if (enablePIIAnonymization) {
+resource aiFoundryCompatibilityPolicyFragment 'Microsoft.ApiManagement/service/policyFragments@2022-08-01' =  {
   parent: apimService
   name: 'ai-foundry-compatibility'
   properties: {
