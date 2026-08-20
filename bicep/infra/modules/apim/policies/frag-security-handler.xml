@@ -85,7 +85,7 @@
     </choose>
 
     <!-- Set default user-id from subscription -->
-    <set-variable name="user-id" value="@(context.Subscription?.Name ?? "anonymous")" />
+    <set-variable name="user-id" value="@(context.Subscription?.Id ?? &quot;anonymous&quot;)" />
 
     <!-- Pre-load APIM named values as fallback defaults for JWT settings -->
     <!-- Product policies can override these by setting jwtAudience, jwtIssuer, jwtOpenIdConfigUrl -->
@@ -187,11 +187,23 @@
                         </issuers>
                     </validate-jwt>
 
-                    <!-- Extract identity from JWT token (azp claim for client credentials flow) -->
-                    <set-variable name="user-id" value="@{
-                        var jwt = (Jwt)context.Variables["validated-jwt"];
-                        return jwt.Claims.GetValueOrDefault("azp", context.Subscription?.Name ?? "anonymous");
-                    }" />
+                    <!-- Resolve a trusted customer identity from the validated JWT.
+     Priority: Entra object ID, token subject, application ID,
+     then the APIM subscription ID. -->
+<set-variable name="user-id" value="@{
+    var jwt = (Jwt)context.Variables[&quot;validated-jwt&quot;];
+
+    return jwt.Claims.GetValueOrDefault(
+        &quot;oid&quot;,
+        jwt.Claims.GetValueOrDefault(
+            &quot;sub&quot;,
+            jwt.Claims.GetValueOrDefault(
+                &quot;azp&quot;,
+                context.Subscription?.Id ?? &quot;anonymous&quot;
+            )
+        )
+    );
+}" />
 
                     <!-- Extract app roles from JWT token -->
                     <set-variable name="jwt-roles" value="@{
@@ -258,4 +270,19 @@
     <trace source="Authentication-Complete" severity="information">
         <message>@($"Unified AI - Auth: {context.Variables.GetValueOrDefault<string>("auth-type", "none")} | User: {context.Variables.GetValueOrDefault<string>("user-id", "anonymous")} | Roles: {context.Variables.GetValueOrDefault<string>("jwt-roles", "none")} | Sub: {context.Variables.GetValueOrDefault<string>("subscription-name", "none")}")</message>
     </trace>
+        <!-- Create a trusted customer ID header.
+     Override any caller-provided value to prevent spoofing. -->
+<set-header name="x-customer-id" exists-action="override">
+    <value>@((string)context.Variables[&quot;user-id&quot;])</value>
+</set-header>
+
+<!-- Record the resolved customer ID in APIM diagnostic traces. -->
+<trace source="Customer-Identity" severity="information">
+    <message>@(
+        &quot;Customer identity resolved | CustomerId: &quot; +
+        (string)context.Variables[&quot;user-id&quot;] +
+        &quot; | RequestId: &quot; +
+        context.RequestId.ToString()
+    )</message>
+</trace>
 </fragment>
