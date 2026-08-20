@@ -89,6 +89,9 @@ param keyVaultName string = ''
 @description('Name of the Azure Managed Redis resource. Leave blank to use default naming conventions.')
 param redisCacheName string = ''
 
+@description('Deploy the Standard Logic App and supporting identity/storage used for usage ingestion.')
+param enableUsageIngestion bool = true
+
 //
 // NETWORKING PARAMETERS - Network configuration and access controls
 //
@@ -796,7 +799,7 @@ module apimManagedIdentity './modules/security/managed-identity-apim.bicep' = {
 
 // The usage managed identity is created early (no dependency on Cosmos DB) so its principal has
 // time to replicate in AAD before the Cosmos SQL role assignment runs (see usageCosmosSqlRole).
-module usageManagedIdentity './modules/security/managed-identity-usage.bicep' = {
+module usageManagedIdentity './modules/security/managed-identity-usage.bicep' = if (enableUsageIngestion) {
   name: 'logicapp-usage-managed-identity'
   params: {
     name: !empty(usageLogicAppIdentityName) ? usageLogicAppIdentityName : '${abbrs.managedIdentityUserAssignedIdentities}logicapp-${resourceToken}'
@@ -1044,7 +1047,7 @@ module cosmosDb './modules/cosmos-db/cosmos-db.bicep' = {
 // its own deployment (after both Cosmos DB and the managed identity exist) so the identity's
 // principal has replicated in AAD, avoiding the transient "principal ID was not found in the AAD
 // tenant" error that Cosmos DB raises when validating a freshly created principal.
-module usageCosmosSqlRole './modules/cosmos-db/cosmos-sql-role-assignment.bicep' = {
+module usageCosmosSqlRole './modules/cosmos-db/cosmos-sql-role-assignment.bicep' = if (enableUsageIngestion) {
   name: 'logicapp-usage-cosmos-sql-role'
   params: {
     cosmosDbAccountName: cosmosDb.outputs.cosmosDbAccountName
@@ -1052,7 +1055,7 @@ module usageCosmosSqlRole './modules/cosmos-db/cosmos-sql-role-assignment.bicep'
   }
 }
 
-module storageAccount './modules/functionapp/storageaccount.bicep' = {
+module storageAccount './modules/functionapp/storageaccount.bicep' = if (enableUsageIngestion) {
   name: 'storage'
   params: {
     location: location
@@ -1080,7 +1083,7 @@ module storageAccount './modules/functionapp/storageaccount.bicep' = {
   }
 }
 
-module logicApp './modules/logicapp/logicapp.bicep' = {
+module logicApp './modules/logicapp/logicapp.bicep' = if (enableUsageIngestion) {
   name: 'usageLogicApp'
   params: {
     location: location
