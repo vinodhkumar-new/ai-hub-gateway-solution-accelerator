@@ -39,17 +39,5 @@ steps:
       AZURE_LOCATION: $(AZURE_LOCATION)
       
 
-  - task: AzureCLI@2
-    displayName: Deploy Application
-    inputs:
-      azureSubscription: azconnection
-      scriptType: bash
-      scriptLocation: inlineScript
-      keepAzSessionActive: true
-      inlineScript: |
-        azd deploy --no-prompt
-    env:
-      AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-      AZURE_ENV_NAME: $(AZURE_ENV_NAME)
-      AZURE_LOCATION: $(AZURE_LOCATION)
+  displayName: Provision Infrastructure
 
